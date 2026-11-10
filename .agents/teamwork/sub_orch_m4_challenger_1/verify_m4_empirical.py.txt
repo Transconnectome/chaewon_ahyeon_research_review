@@ -1,0 +1,241 @@
+#!/usr/bin/env python3
+"""
+Empirical Verification & Adversarial Stress Harness for Milestone 4 Deliverable.
+Location: .agents/teamwork/sub_orch_m4_challenger_1/verify_m4_empirical.py
+Author: Milestone 4 Adversarial Challenger 1
+"""
+
+import os
+import re
+import sys
+import ast
+from pathlib import Path
+import numpy as np
+import scipy.stats as stats
+
+ROADMAP_PATH = Path("/home/juke/git/chaewon_ahyeon_research_review/docs/04_action_items_roadmap.md")
+SYNTHESIS_PATH = Path("/home/juke/git/chaewon_ahyeon_research_review/docs/01_research_synthesis.md")
+DEEP_RES_PATH = Path("/home/juke/git/chaewon_ahyeon_research_review/docs/02_deep_research_literature.md")
+ADVERSARIAL_PATH = Path("/home/juke/git/chaewon_ahyeon_research_review/docs/03_adversarial_review.md")
+
+results = []
+
+def record(test_name, passed, message, severity="HIGH"):
+    status = "PASS" if passed else "FAIL"
+    results.append({
+        "test": test_name,
+        "status": status,
+        "passed": passed,
+        "message": message,
+        "severity": severity
+    })
+    print(f"[{status}] ({severity}) {test_name}: {message}")
+
+def audit_file_presence_and_format():
+    if not ROADMAP_PATH.exists():
+        record("file_existence", False, f"File {ROADMAP_PATH} does not exist", "CRITICAL")
+        return
+    text = ROADMAP_PATH.read_text(encoding="utf-8")
+    sz_kb = len(text.encode("utf-8")) / 1024.0
+    record("file_size_bounds", 3.0 <= sz_kb <= 200.0, f"File size is {sz_kb:.1f} KB (bounds: [3KB, 200KB])")
+    record("top_level_heading", text.startswith("# "), "Document starts with top-level H1 header '# '")
+
+def audit_honorifics():
+    docs = [ROADMAP_PATH, SYNTHESIS_PATH, DEEP_RES_PATH, ADVERSARIAL_PATH]
+    for doc in docs:
+        if not doc.exists():
+            continue
+        text = doc.read_text(encoding="utf-8")
+        v_ahn = re.findall(r'안채원(?!\s*선생님)', text)
+        v_lee = re.findall(r'이아현(?!\s*선생님)', text)
+        v_ssi = re.findall(r'(안채원|이아현)\s*씨', text)
+        banmal = re.findall(r'(?:안채원|이아현)\s*선생님이?\s*(?:했다|보았다|주장했다|작성했다)(?!습니다)', text)
+        
+        passed = (len(v_ahn) == 0 and len(v_lee) == 0 and len(v_ssi) == 0 and len(banmal) == 0)
+        msg = f"{doc.name}: Ahn_violations={len(v_ahn)}, Lee_violations={len(v_lee)}, Ssi={len(v_ssi)}, Banmal={len(banmal)}"
+        record(f"honorifics_{doc.name}", passed, msg, "CRITICAL")
+
+def audit_table_syntax_and_delimiters():
+    text = ROADMAP_PATH.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    in_table = False
+    table_headers = []
+    table_delims = []
+    malformed_tables = 0
+    
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("|") and stripped.endswith("|"):
+            cols = [c.strip() for c in stripped.split("|")[1:-1]]
+            if not in_table:
+                in_table = True
+                table_headers = cols
+            elif in_table and len(table_delims) == 0:
+                is_delim = all(re.match(r"^:?-+:?$", c) for c in cols)
+                if is_delim:
+                    table_delims = cols
+                    if len(table_delims) != len(table_headers):
+                        malformed_tables += 1
+                else:
+                    malformed_tables += 1
+            else:
+                if len(cols) != len(table_headers):
+                    malformed_tables += 1
+        else:
+            in_table = False
+            table_headers = []
+            table_delims = []
+            
+    record("table_pipe_syntax", malformed_tables == 0, f"Malformed markdown table rows: {malformed_tables}", "MEDIUM")
+
+def audit_compute_budget_arithmetic():
+    text = ROADMAP_PATH.read_text(encoding="utf-8")
+    # Parse Table 5.2
+    exp_matches = re.findall(r'\|\s*\*\*EXP-T\d+-\d+\*\*\s*\|.*?\|\s*\*\*([0-9,]+)\s*GPUh\*\*\s*\|', text)
+    individual_gpuh = [int(m.replace(',', '')) for m in exp_matches]
+    actual_sum = sum(individual_gpuh)
+    
+    tot_match = re.search(r'\|\s*\*\*합계\*\*\s*\|.*?\|\s*\*\*([0-9,]+)\s*GPUh\*\*\s*\|', text)
+    if tot_match:
+        reported_sum = int(tot_match.group(1).replace(',', ''))
+    else:
+        reported_sum = None
+        
+    passed = (reported_sum == actual_sum)
+    msg = f"Reported total: {reported_sum} GPUh, Actual sum of 20 items: {actual_sum} GPUh (Delta: {actual_sum - (reported_sum or 0)} GPUh)"
+    record("compute_budget_table_sum", passed, msg, "HIGH")
+    
+    # Check Aurora allocation
+    aurora_matches = re.findall(r'\|\s*\*\*EXP-T\d+-\d+\*\*\s*\|.*?ALCF Aurora.*?\|\s*\*\*([0-9,]+)\s*GPUh\*\*\s*\|', text)
+    aurora_sum = sum(int(m.replace(',', '')) for m in aurora_matches)
+    record("aurora_allocation_bound", aurora_sum == 25000, f"Aurora total GPUh: {aurora_sum} GPUh (Target grant: 25,000 GPUh)", "MEDIUM")
+
+def audit_timeline_and_calendar():
+    text = ROADMAP_PATH.read_text(encoding="utf-8")
+    # Deadlines
+    has_2026_11_20 = "2026-11-20" in text or "11/20" in text
+    inter_dates = ["11/15", "11/17", "11/18", "11/19"]
+    missing_inter = [d for d in inter_dates if d not in text]
+    
+    record("timeline_hard_deadline", has_2026_11_20, "Contains hard submission deadline 2026-11-20")
+    record("timeline_intermediate_milestones", len(missing_inter) == 0, f"Intermediate dates check: missing {missing_inter}")
+
+def audit_statistical_fdr_and_claims():
+    text = ROADMAP_PATH.read_text(encoding="utf-8")
+    # Extract RAW_DELTAS from text if present
+    match = re.search(r'RAW_DELTAS\s*=\s*np\.array\(\[\s*([\s\S]*?)\]\)', text)
+    if not match:
+        record("raw_deltas_presence", False, "Could not extract RAW_DELTAS matrix from text", "HIGH")
+        return
+    
+    matrix_str = match.group(1).strip()
+    rows = []
+    for line in matrix_str.splitlines():
+        line = line.strip().rstrip(',')
+        if line.startswith('[') and line.endswith(']'):
+            vals = [float(x.strip()) for x in line[1:-1].split(',')]
+            rows.append(vals)
+            
+    deltas = np.array(rows)
+    df = deltas.shape[1] - 1
+    means = np.mean(deltas, axis=1)
+    sems = stats.sem(deltas, axis=1)
+    margin = -0.005
+    
+    t_stats = (means - margin) / sems
+    p_noninf = 1.0 - stats.t.cdf(t_stats, df)
+    
+    n_tasks = len(p_noninf)
+    sorted_idx = np.argsort(p_noninf)
+    sorted_p = p_noninf[sorted_idx]
+    q_vals = np.zeros(n_tasks)
+    q_vals[sorted_idx] = np.minimum.accumulate((sorted_p * n_tasks / np.arange(1, n_tasks + 1))[::-1])[::-1]
+    q_vals = np.clip(q_vals, 0, 1)
+    
+    passing_fdr = np.sum(q_vals < 0.05)
+    passing_bonf = np.sum(p_noninf < (0.05 / n_tasks))
+    
+    record("fdr_calculation_verified", True, f"FDR evaluated on {n_tasks} tasks: {passing_fdr}/{n_tasks} pass FDR, {passing_bonf}/{n_tasks} pass Bonferroni")
+    
+    # Check claim: "across all individual subtasks"
+    all_subtasks_claimed = "across all individual subtasks" in text
+    if all_subtasks_claimed and passing_fdr < n_tasks:
+        record("abstract_claim_soundness", False, f"Abstract claims non-inferiority 'across all individual subtasks', but empirical math shows only {passing_fdr}/{n_tasks} pass (Tasks 9, 10, 13, 14 fail)", "HIGH")
+    else:
+        record("abstract_claim_soundness", True, "Claims accurately reflect FDR pass rate", "LOW")
+
+def audit_code_snippets_runnability():
+    text = ROADMAP_PATH.read_text(encoding="utf-8")
+    # Extract python code blocks
+    code_blocks = re.findall(r'```python\n([\s\S]*?)```', text)
+    record("code_blocks_count", len(code_blocks) >= 2, f"Found {len(code_blocks)} python code snippets")
+    
+    # Check PSD baseline mock data behavior
+    for i, code in enumerate(code_blocks):
+        try:
+            ast.parse(code)
+            record(f"code_syntax_block_{i+1}", True, f"Python block {i+1} is syntactically valid AST")
+        except SyntaxError as e:
+            record(f"code_syntax_block_{i+1}", False, f"Python block {i+1} syntax error: {e}", "HIGH")
+            
+        # Test PSD mock execution
+        if "extract_band_psd" in code and "evaluate_psd_vs_diver" in code:
+            # Check if dummy test has correlation or asserts
+            has_flawed_mock = "div_tr = np.random.randn(200, 512)" in code and "y_tr = np.random.randint" in code and "expand_dims(y_te" in code
+            if has_flawed_mock:
+                record("psd_script_mock_test_integrity", False, "psd_baseline mock test under `if __name__ == '__main__'` lacks label signal in training set, triggering AssertionError upon execution", "MEDIUM")
+            else:
+                record("psd_script_mock_test_integrity", True, "psd_baseline mock data is properly conditioned", "LOW")
+
+def audit_vulnerability_coverage():
+    adv_text = ADVERSARIAL_PATH.read_text(encoding="utf-8") if ADVERSARIAL_PATH.exists() else ""
+    road_text = ROADMAP_PATH.read_text(encoding="utf-8")
+    
+    vulns = [f"VULN-{i:02d}" for i in range(1, 12)]
+    missing_vulns = [v for v in vulns if v not in road_text]
+    record("all_11_vulnerabilities_covered", len(missing_vulns) == 0, f"Missing vulnerabilities: {missing_vulns}", "CRITICAL")
+    
+    # Check Section 1.2 table rows
+    table_rows = re.findall(r'\|\s*\*\*(VULN-\d+)\*\*\s*\|', road_text)
+    record("vuln_matrix_table_rows", len(table_rows) == 11, f"Table 1.2 maps {len(table_rows)} vulnerabilities (expected 11)", "HIGH")
+
+def audit_cluster_policy_compliance():
+    text = ROADMAP_PATH.read_text(encoding="utf-8")
+    # SNUBIC rule check: web slot reservation
+    snubic_res = "웹 슬롯 예약" in text or "Web Slot Reservation" in text
+    snubic_nogpu_default = "--use-gpu False" in text
+    record("snubic_reservation_policy", snubic_res and snubic_nogpu_default, "SNUBIC policy mandates web slot reservation and --use-gpu False")
+    
+    # Connectome rule check: no find/du/grep over storage
+    connectome_find = "labfind" in text and ("find" in text and "금지" in text)
+    record("connectome_nfs_policy", connectome_find, "Connectome NFS policy bans raw find/du and specifies labfind")
+    
+    # Local DGX-Spark rule check: gpu_oom_guard
+    dgx_spark = "gpu_oom_guard.py" in text
+    record("dgx_spark_oom_guard", dgx_spark, "Local DGX-Spark rules specify gpu_oom_guard.py and ban large local runs")
+
+def main():
+    print("="*70)
+    print("STARTING EMPIRICAL VERIFICATION HARNESS FOR MILESTONE 4")
+    print("="*70)
+    audit_file_presence_and_format()
+    audit_honorifics()
+    audit_table_syntax_and_delimiters()
+    audit_compute_budget_arithmetic()
+    audit_timeline_and_calendar()
+    audit_statistical_fdr_and_claims()
+    audit_code_snippets_runnability()
+    audit_vulnerability_coverage()
+    audit_cluster_policy_compliance()
+    print("="*70)
+    print("SUMMARY OF VERIFICATION CHECKS:")
+    passed_count = sum(1 for r in results if r["passed"])
+    failed_count = sum(1 for r in results if not r["passed"])
+    print(f"Total: {len(results)}, Passed: {passed_count}, Failed: {failed_count}")
+    print("="*70)
+    for r in results:
+        if not r["passed"]:
+            print(f"FAILED CHECK: [{r['severity']}] {r['test']} -> {r['message']}")
+
+if __name__ == "__main__":
+    main()

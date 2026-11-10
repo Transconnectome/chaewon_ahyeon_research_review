@@ -1,0 +1,37 @@
+{
+  "timestamp": "2026-11-10T16:30:30Z",
+  "progressive_mode": true,
+  "elapsed_seconds": 0.286,
+  "total_tests": 82,
+  "passed": 38,
+  "failed": 0,
+  "skipped": 44,
+  "tier_breakdown": {
+    "1": {
+      "total": 35,
+      "pass": 15,
+      "fail": 0,
+      "skip": 20
+    },
+    "2": {
+      "total": 35,
+      "pass": 18,
+      "fail": 0,
+      "skip": 17
+    },
+    "3": {
+      "total": 7,
+      "pass": 2,
+      "fail": 0,
+      "skip": 5
+    },
+    "4": {
+      "total": 5,
+      "pass": 3,
+      "fail": 0,
+      "skip": 2
+    }
+  },
+  "failures": [],
+  "verdict": "PASS"
+}

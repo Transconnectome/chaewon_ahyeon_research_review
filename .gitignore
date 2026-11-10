@@ -1,0 +1,101 @@
+# =====================================================================
+# Git Ignore Configuration: chaewon_ahyeon_research_review
+# =====================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# C extensions
+*.dylib
+*.dll
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Unit test / coverage / test reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+test_reports/
+*.junit.xml
+
+# Temporary, backup, and editor artifacts
+*.swp
+*.swo
+*.tmp
+*.bak
+*~
+*.orig
+.directory
+
+# Operating System specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and Project Environments
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Environments & virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Deep learning weights & large data files (Heavy binaries)
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.onnx
+*.mdb
+*.tar.gz
+*.zip
+*.parquet
+
+# Profiling and logging
+*.prof
+*.pstats
+wandb/
+mlruns/
