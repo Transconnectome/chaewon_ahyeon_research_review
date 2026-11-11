@@ -53,6 +53,7 @@
 | **Spec** | [PROJECT.md](PROJECT.md) | 프로젝트 아키텍처, 기능 인벤토리(F1~F7), 마일스톤(M1~M5) 및 인터페이스 계약 명세서 | 연구진 공통 |
 | **Infra** | [TEST_INFRA.md](TEST_INFRA.md) | E2E 테스트 인프라 아키텍처, 4-Tier 검증 계층 명세, 거버넌스 및 엄격한 호칭 정책 가이드 | 연구진 공통 |
 | **Ready** | [TEST_READY.md](TEST_READY.md) | 테스트 스위트 준비 상태 점검표 및 독립 검증 절차서 | 연구진 공통 |
+| **Code** | [code/asymmetric_mae/README.md](code/asymmetric_mae/README.md) | 진정한 비대칭 인코더-디코더 MAE (`AsymmetricMultiHeadMAEModel`) `DIVER-2` 무수정 드롭인 구현, 실행 래퍼 및 7대 스모크 테스트 | 안채원 선생님, 이아현 선생님, 차지욱 교수님 |
 
 ---
 
