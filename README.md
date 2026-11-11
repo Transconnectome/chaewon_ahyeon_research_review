@@ -50,6 +50,7 @@
 | **R2-1** | [docs/02_deep_research_literature.md](docs/02_deep_research_literature.md) | 94편 최신 신경 스케일링 문헌 딥리서치, 5대 선행 모델(Oliveira, Narayanswamy, Banville, Ooi, Truong) 메타 비교, iEEG 2축 스케일링 수식 모델 정식화 | 안채원 선생님, 이아현 선생님 |
 | **R2-2** | [docs/03_adversarial_review.md](docs/03_adversarial_review.md) | 과학적 방법론에 기반한 5대 적대적 검증 축(가설 타당성, 인과 추론, 대조군 설계, 재구성 손실 역설, 통계적 엄밀성), 취약점 규명 및 칼 포퍼 반증 조건 | 차지욱 교수님, 이아현 선생님, 안채원 선생님 |
 | **R3** | [docs/04_action_items_roadmap.md](docs/04_action_items_roadmap.md) | 3단계 우선순위 실행 로드맵 (Tier 1: AAAI 2027 NeuroAI 워크숍 마감 11/20, Tier 2: DIVER-2 저널 논문, Tier 3: 실시간 임상 BCI), 구체적 액션 아이템 18건 | 안채원 선생님, 이아현 선생님, 차지욱 교수님 |
+| **R3-New** | [docs/05_additional_advice.md](docs/05_additional_advice.md) | DIVER-2 파운데이션 모델 및 iMindBench 전수 재검토 기반 15대 사각지대 규명, 비대칭 MAE 4대 코드 결함 수정, 11/20 워크숍 즉각 조치 5건 및 본 논문 확장 로드맵 5건 | 안채원 선생님, 이아현 선생님, 차지욱 교수님 |
 | **Spec** | [PROJECT.md](PROJECT.md) | 프로젝트 아키텍처, 기능 인벤토리(F1~F7), 마일스톤(M1~M5) 및 인터페이스 계약 명세서 | 연구진 공통 |
 | **Infra** | [TEST_INFRA.md](TEST_INFRA.md) | E2E 테스트 인프라 아키텍처, 4-Tier 검증 계층 명세, 거버넌스 및 엄격한 호칭 정책 가이드 | 연구진 공통 |
 | **Ready** | [TEST_READY.md](TEST_READY.md) | 테스트 스위트 준비 상태 점검표 및 독립 검증 절차서 | 연구진 공통 |
@@ -178,6 +179,44 @@ $$L(N_s, T_p) = L_\infty + \frac{A}{N_s^\alpha} \cdot \left(1 + \frac{B}{T_p^\be
 $$S(N_s, T_p) = S_\infty - \frac{\Delta S_{\max}}{1 + \left(\frac{N_s}{N_{s,0}}\right)^{\gamma_s}} - \frac{\Delta S_T}{1 + \left(\frac{T_p}{T_{p,0}}\right)^{\gamma_t}}$$
 
 실측 데이터 피팅 결과, 시간 포화 임계값 $T_{p,0} \approx 80\text{ hours}$, 피험자 온셋 임계값 $N_{s,0} \approx 6.2\text{ subjects}$로 수렴하여 이론과 실측이 일치함을 입증하였습니다.
+
+### 5.2 결정적 추가 조언: 15대 사각지대 전수 감사 및 비대칭 MAE 강화 요약 (Critical Additional Advice)
+
+원천 실험 코드(`chaewon-intern-2026fall`), DIVER-2 파운데이션 모델(`DIVER-2`), 장기 문맥 최적화 저장소(`DIVER-dense-long-context`)에 대한 전수 재검토([docs/05_additional_advice.md](docs/05_additional_advice.md))를 통해, 기존 검토에서 간과되었던 15대 심층 사각지대를 규명하고 비대칭 MAE 구현을 강화하였습니다:
+
+1. **5대 원천 실험 설계 및 통계 사각지대 규명**:
+   - **피험자 2% 기록 분할 데이터 누수 및 신규 환자 손실 2.88배 폭증**: 검증 셋(`gen_gap_eval.py:53-57`)이 동일 37명의 2% 분할(`record_holdout=0.02`)에 불과하며, 미학습 신규 환자(`newsubj_summary.json`)에 대한 재구성 손실은 0.2791로 2.88배 폭증하고 데이터 축소 간 차이는 -0.06%로 동등 수렴(바닥 효과).
+   - **Neuroprobe 15개 과제 다중 비교 무보정(FWER 53.67%) 및 본페로니 붕괴**: `split_np.py:6`에서 다중 비교 미보정으로 인해 1종 오류율이 53.67%로 팽창하였으며, 본페로니 보정($t \approx 5.38$) 시 모든 과제의 신뢰구간 하한이 비열등선($-0.0050$) 아래로 붕괴(`word_gap` +0.0078 점수 상승은 우연 표본 판정).
+   - **2.88M 샘플 고정 실험의 에폭 편향 및 심부 전극 비율($r=+0.473$) 교란**: $N=2$ 조건은 동일 뇌파를 82.4회 반복 학습하여 과적합되었으며, 심부 전극(sEEG Depth) 비율과 손실 간에 $r=+0.473$의 강력한 상관이 측정되어 2명 붕괴가 뇌엽 커버리지 결손에 기인함을 실측.
+   - **다운스트림 1층 vs 12층 표상 붕괴 및 유효 차원 5~6차원 축퇴**: Small(12층) 모델에서 1층은 유지($+0.0003$)되었으나 최상위 12층은 $-0.0050$으로 붕괴되었으며, 512차원 임베딩의 유효 차원(Participation Ratio)이 5~6차원으로 극단 축퇴.
+   - **Neuroprobe 56~167 복셀 좌표 입력 왜곡 및 결측 채널 제로필 인공물**: Neuroprobe eval h5가 MNI mm가 아닌 56~167 복셀 좌표를 전달하여 르장드르 공간 바이어스가 단위 구 밖($r\_hat > 1.9$)으로 외삽 왜곡되었고, 결측 채널의 0.0 대치가 무차별 어텐션을 유발.
+
+2. **DIVER 파운데이션 모델 아키텍처 결함 및 수치 한계**:
+   - **패딩 마스크 단위 불일치 버그(0.3초만 학습)**: 500-sample 로더와 50-sample 토큰 간 단위 불일치(`PADDING_MASK_BUG.md`)로 3.0초 중 앞선 0.3초(10.6%)만 어텐션 및 손실을 계산하고 89.4%가 버려진 결함 확인.
+   - **RoPE bfloat16 위치 인덱스 충돌(829개 생존)**: `arange(6001, dtype=bfloat16)` 생성 시 256 초과 위치가 절단되어 86.2%의 위치 차이가 0으로 양자화되는 치명적 버그 확인.
+   - **평탄화 시퀀스 $O(C^2 N^2)$ 연산 폭발 및 Dense Attention Bias 메모리 벽**: 32채널 600초에서 레이어당 1,169 GiB의 편향 행렬 실체화로 FlashAttention이 차단되는 구조적 한계 규명.
+   - **0.1초 마스킹의 국소 스플라인 보간 과적합**: 미세 패치 마스킹이 인접 신호 보간 지름길을 유도하여 장기 문맥 학습 그래디언트를 소실시킴.
+   - **사전학습 손실과 프로브 점수 간 상관계수 전무**: $\rho = +0.29$ ($p=0.26$)으로 MSE 손실 개선이 다운스트림 성능을 보장하지 못함을 규명.
+
+3. **비대칭 MAE (`code/asymmetric_mae/`) 4대 결함 수정 및 단위 검증 (11/11 PASS)**:
+   - $L=1$ 단일 패치 엣지 케이스 NaN loss 방어 (`ref_len = max(2, ref_len)`, `mask.sum() == 0` 시 safety fallback).
+   - 이종 채널 몽타주 배치 시 환자별 독립 per-sample `k_vis` 적용으로 소수 채널 마스크 소멸 방지.
+   - 레지스터 토큰 인덱싱을 `torch.nonzero`에서 closed-form tensor concatenation으로 대체하여 GPU-host 동기화 버블 제거.
+   - `export_imindbench_compat_checkpoint`에서 DDP `module.` 접두사 제거 및 `norm.weight`로부터 width/depth 자동 역추론.
+
+4. **11/20 NeuroAI 워크숍 즉각 조치 5대 실행 가이드라인**:
+   - **[WS-ACT-01] 초록/본문 주장 수위 한정**: "within-subject within-session frozen linear probe non-inferiority"로 엄격 한정.
+   - **[WS-ACT-02] 동일 피험자 한계 명시**: 2% 기록 분할 한계 및 완전 미학습 신규 환자 손실(2.88배 바닥효과 0.2791) 부록 공개.
+   - **[WS-ACT-03] 다중 비교 FDR 보정치 표기**: 15개 과제 FDR $q$-값 병기 및 `word_gap` 향상 주장을 탐색적 관찰로 정정.
+   - **[WS-ACT-04] Layer 12 심층 표상 붕괴 솔직 기술**: 1층 유지와 12층 붕괴(-0.0050)를 명시하고 비대칭 디코더 솔루션 제시.
+   - **[WS-ACT-05] RoPE float32 패치 및 DDP 클린업**: 위치 충돌 방지 패치 및 DDP 접두사 제거 체크포인트 배포.
+
+5. **워크숍 이후 본 논문(Journal/Conference) 구조적 확장을 위한 5대 전략 로드맵**:
+   - **[LT-ACT-01] 교차 피험자(Zero-shot Cross-Subject) 프로토콜 구축**: 3D MNI 좌표 쿼리 어텐션 도입 및 `regime: hold-out-subject` 검증.
+   - **[LT-ACT-02] $O(C^2 N^2)$ 타파 및 FlashAttention-2 통합**: `bias_kernel='augmented'` 병합 및 Criss-Cross 분리형 어텐션 하이브리드 백본 구축.
+   - **[LT-ACT-03] Span Masking 및 주파수 인식 손실 도입**: 1~5초 연속 마스킹 및 주파수 대역 엔트로피(`BC1_band_ce`)/대조학습(`G0_paper_id`) 결합.
+   - **[LT-ACT-04] MNI mm 정합 좌표계 및 Varlen 파이프라인**: Neuroprobe 복셀 좌표 전처리 및 가변 채널 Jagged Tensor 파이프라인 구축.
+   - **[LT-ACT-05] 임상 뇌전증/수면 다기관 검증 정착**: MAYO 발작 검출 및 수면 다원 검사(PSG) 다기관 확장, 뇌엽 균일 계층화 표본 추출.
 
 ---
 

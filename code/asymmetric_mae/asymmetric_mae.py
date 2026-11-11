@@ -209,22 +209,57 @@ class AsymmetricMultiHeadMAEModel(MultiHeadPrependPatchMaskedModel):
             valid_flat = real_patch_valid.reshape(B, L)
             # Push invalid (padded) slots behind all real slots in argsort
             noise = noise + (~valid_flat).float() * 10.0
-            ref_valid = int(valid_flat.sum(dim=1).max().item())
-            ref_len = max(2, ref_valid)
+
+            # Per-sample k_vis calculation to prevent heterogeneous montage mask vanishing
+            k_vis_list = []
+            for b in range(B):
+                v_b = int(valid_flat[b].sum().item())
+                if v_b >= 2:
+                    k_b = int(round((1.0 - self.mask_ratio) * v_b))
+                    k_b = max(1, min(v_b - 1, k_b))
+                else:
+                    k_b = 1
+                k_vis_list.append(k_b)
+            k_vis_max = max(1, min(L - 1, max(k_vis_list))) if L >= 2 else 1
+
+            ids_shuffle = torch.argsort(noise, dim=1)  # [B, L]
+            ids_keep_list = []
+            mask_flat = torch.zeros(B, L, dtype=self.precision, device=device)
+
+            for b in range(B):
+                v_b = int(valid_flat[b].sum().item())
+                k_b = k_vis_list[b]
+                vis_tokens = ids_shuffle[b, :k_b]
+                mask_tokens = ids_shuffle[b, k_b:v_b]
+                mask_flat[b].scatter_(0, mask_tokens, 1.0)
+
+                if k_vis_max > k_b:
+                    extra_needed = k_vis_max - k_b
+                    extra_tokens = ids_shuffle[b, v_b:v_b + extra_needed]
+                    if extra_tokens.numel() < extra_needed:
+                        extra_tokens = ids_shuffle[b, :extra_needed]
+                    sample_keep = torch.cat([vis_tokens, extra_tokens])
+                else:
+                    sample_keep = vis_tokens[:k_vis_max]
+
+                sample_keep = torch.sort(sample_keep).values
+                ids_keep_list.append(sample_keep)
+
+            ids_keep = torch.stack(ids_keep_list, dim=0)
         else:
-            ref_len = L
+            ref_len = max(2, L)
+            k_vis = int(round((1.0 - self.mask_ratio) * ref_len))
+            k_vis = max(1, min(L - 1, k_vis)) if L >= 2 else 1
 
-        k_vis = int(round((1.0 - self.mask_ratio) * ref_len))
-        k_vis = max(1, min(L - 1, k_vis))
+            ids_shuffle = torch.argsort(noise, dim=1)  # [B, L]
+            ids_keep = torch.sort(ids_shuffle[:, :k_vis], dim=1).values  # [B, K_vis], sorted for cache locality
 
-        ids_shuffle = torch.argsort(noise, dim=1)  # [B, L]
-        ids_keep = torch.sort(ids_shuffle[:, :k_vis], dim=1).values  # [B, K_vis], sorted for cache locality
+            mask_flat = torch.ones(B, L, dtype=self.precision, device=device)
+            mask_flat.scatter_(1, ids_keep, 0.0)
 
-        mask_flat = torch.ones(B, L, dtype=self.precision, device=device)
-        mask_flat.scatter_(1, ids_keep, 0.0)
-        if real_patch_valid is not None:
-            # Never score reconstruction loss on padded slots
-            mask_flat = mask_flat * real_patch_valid.reshape(B, L).to(self.precision)
+        # Safety fallback: ensure at least one token is masked to prevent empty tensor NaN loss
+        if mask_flat.sum() == 0.0:
+            mask_flat[0, 0] = 1.0
 
         return ids_keep, mask_flat.view(B, C, N), real_patch_valid
 
@@ -269,11 +304,12 @@ class AsymmetricMultiHeadMAEModel(MultiHeadPrependPatchMaskedModel):
             torch.arange(N_aug, device=device), (C_aug,)
         ).expand(B, -1)
 
-        # Register token flat positions: row < kc OR col < kn
-        rows = torch.arange(C_aug, device=device).unsqueeze(1).expand(C_aug, N_aug)
-        cols = torch.arange(N_aug, device=device).unsqueeze(0).expand(C_aug, N_aug)
-        is_reg = (rows < kc) | (cols < kn)
-        reg_flat_idx = torch.nonzero(is_reg.reshape(-1), as_tuple=False).squeeze(-1)  # [L_reg]
+        # Register token flat positions: row < kc OR col < kn (closed-form without GPU-host sync)
+        row_part = torch.arange(kc * N_aug, device=device)
+        r_idx = torch.arange(kc, C_aug, device=device).unsqueeze(1)
+        c_idx = torch.arange(kn, device=device).unsqueeze(0)
+        col_part = (r_idx * N_aug + c_idx).reshape(-1)
+        reg_flat_idx = torch.cat([row_part, col_part])
         L_reg = int(reg_flat_idx.numel())
 
         # Map kept patch index p in [0, C*N) -> (c + kc, n + kn) in (C_aug, N_aug)
@@ -556,8 +592,34 @@ def export_imindbench_compat_checkpoint(src_ckpt_path: str, dst_ckpt_path: Optio
 
     ckpt = torch.load(src_path, map_location="cpu", weights_only=False)
     saved_args = dict(ckpt.get("args", {}))
-    width = saved_args.get("width", 512)
-    depth = saved_args.get("depth", 12)
+
+    # Strip DDP module. prefix if present
+    raw_sd = ckpt["model_state_dict"]
+    asym_sd = {
+        (k[7:] if k.startswith("module.") else k): v
+        for k, v in raw_sd.items()
+    }
+
+    # Auto-infer width from backbone state dict if missing or default
+    if "encoder.encoder.norm.weight" in asym_sd:
+        width = asym_sd["encoder.encoder.norm.weight"].shape[0]
+    elif "width" in saved_args:
+        width = saved_args["width"]
+    else:
+        width = 512
+
+    # Auto-infer depth from backbone layers if missing or default
+    layer_indices = [
+        int(k.split("encoder.encoder.layers.")[1].split(".")[0])
+        for k in asym_sd
+        if "encoder.encoder.layers." in k and k.split("encoder.encoder.layers.")[1].split(".")[0].isdigit()
+    ]
+    if layer_indices:
+        depth = max(layer_indices) + 1
+    elif "depth" in saved_args:
+        depth = saved_args["depth"]
+    else:
+        depth = 12
 
     stock_cfg = cfg_model_utils.get_model_config(
         "DIVER_iEEG_FINAL_model", width=width, depth=depth, mup=False
@@ -567,7 +629,6 @@ def export_imindbench_compat_checkpoint(src_ckpt_path: str, dst_ckpt_path: Optio
 
     stock_ref = diver_mod.build_model(stock_cfg)
     stock_sd = stock_ref.state_dict()
-    asym_sd = ckpt["model_state_dict"]
 
     decoder_only_prefixes = (
         "enc_to_dec.",

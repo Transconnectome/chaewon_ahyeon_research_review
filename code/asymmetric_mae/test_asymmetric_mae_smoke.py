@@ -320,6 +320,118 @@ class AsymmetricMAESmokeTests(unittest.TestCase):
                 "last_imindbench_compat.pt was not exported",
             )
 
+    def test_8_l1_single_patch_nan_defense(self):
+        """Verify L=1 single patch edge case computes finite loss and does not produce NaN."""
+        cfg = Experiments.DIVER_iEEG_ASYM_MAE_model(d_model=128, e_layers=2, patch_size=500)
+        model = diver_mod.build_model(cfg).train()
+        ssl = build_ssl_method(
+            "MAEMultiHead_onlypatchwise",
+            model,
+            SimpleNamespace(cl_weight=1.0, cl_temperature=0.5),
+            loss_configs=cfg.basemodel.params["patchwise_ssl_configs"],
+        )
+        x = torch.randn(2, 1, 500)
+        info = [
+            {
+                "modality": "iEEG",
+                "channel_types": ["iEEG"],
+                "channel_subtypes": ["depth"],
+                "xyz_id": np.random.randn(1, 3).astype(np.float32),
+                "input_was_resampled_and_padded": False,
+            }
+            for _ in range(2)
+        ]
+        loss = ssl.compute_loss(x, data_info_list=info)
+        self.assertTrue(torch.isfinite(loss), f"L=1 produced non-finite loss: {loss}")
+        loss.backward()
+
+    def test_9_heterogeneous_montage_masking_guard(self):
+        """Verify per-sample k_vis prevents mask vanishing for minority-channel subjects."""
+        cfg = Experiments.DIVER_iEEG_ASYM_MAE_model(d_model=128, e_layers=2, patch_size=500)
+        model = diver_mod.build_model(cfg).eval()
+
+        C, N = 32, 3
+        valid_b = np.zeros((C, N, 500), dtype=bool)
+        valid_b[:4, :, :] = True  # Patient B has only 4 channels (12 patches)
+        valid_a = np.ones((C, N, 500), dtype=bool)  # Patient A has 32 channels (96 patches)
+
+        x = torch.randn(2, C, N * 500)
+        info = [
+            {
+                "modality": "iEEG",
+                "channel_types": ["iEEG"] * C,
+                "channel_subtypes": ["depth"] * C,
+                "xyz_id": np.random.randn(C, 3).astype(np.float32),
+                "input_was_resampled_and_padded": True,
+                "valid": valid_b,
+            },
+            {
+                "modality": "iEEG",
+                "channel_types": ["iEEG"] * C,
+                "channel_subtypes": ["depth"] * C,
+                "xyz_id": np.random.randn(C, 3).astype(np.float32),
+                "input_was_resampled_and_padded": True,
+                "valid": valid_a,
+            },
+        ]
+        out = model(x, data_info_list=info, use_mask=True)
+        mask_b = out["mask"][0].sum().item()
+        mask_a = out["mask"][1].sum().item()
+        self.assertGreater(mask_b, 0.0, f"Patient B mask vanished (got sum={mask_b})")
+        self.assertGreater(mask_a, 0.0, f"Patient A mask vanished (got sum={mask_a})")
+
+    def test_10_closed_form_register_indexing_equivalence(self):
+        """Verify closed-form register index generation exactly matches torch.nonzero across shapes."""
+        test_shapes = [(9, 4), (17, 31), (33, 61), (5, 6)]
+        for C_aug, N_aug in test_shapes:
+            kc, kn = 1, 1
+            rows = torch.arange(C_aug).unsqueeze(1).expand(C_aug, N_aug)
+            cols = torch.arange(N_aug).unsqueeze(0).expand(C_aug, N_aug)
+            is_reg = (rows < kc) | (cols < kn)
+            old_reg = torch.nonzero(is_reg.reshape(-1), as_tuple=False).squeeze(-1)
+
+            row_part = torch.arange(kc * N_aug)
+            r_idx = torch.arange(kc, C_aug).unsqueeze(1)
+            c_idx = torch.arange(kn).unsqueeze(0)
+            col_part = (r_idx * N_aug + c_idx).reshape(-1)
+            new_reg = torch.cat([row_part, col_part])
+            self.assertTrue(
+                torch.equal(old_reg, new_reg),
+                f"Register index mismatch for shape ({C_aug}, {N_aug})",
+            )
+
+    def test_11_ddp_module_prefix_and_shape_auto_inference(self):
+        """Verify DDP module. prefix removal and width/depth auto-inference from state dict."""
+        import tempfile
+        from asymmetric_mae import export_imindbench_compat_checkpoint
+
+        asym_cfg = Experiments.DIVER_iEEG_ASYM_MAE_model(d_model=128, e_layers=3)
+        asym_model = diver_mod.build_model(asym_cfg).eval()
+        raw_sd = asym_model.state_dict()
+        ddp_sd = {f"module.{k}": v for k, v in raw_sd.items()}
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ckpt_path = Path(tmpdir) / "ddp_model.pt"
+            torch.save(
+                {
+                    "format_version": 3,
+                    "epoch": 1,
+                    "global_step": 5,
+                    "model_state_dict": ddp_sd,
+                    "args": {"model_config": "DIVER_iEEG_ASYM_MAE_model"},  # Intentionally omitted width/depth
+                },
+                ckpt_path,
+            )
+
+            compat_path = export_imindbench_compat_checkpoint(str(ckpt_path))
+            compat = torch.load(compat_path, map_location="cpu", weights_only=False)
+            self.assertIn("encoder.encoder.norm.weight", compat["model_state_dict"])
+            self.assertFalse(any(k.startswith("module.") for k in compat["model_state_dict"]))
+
+            stock_cfg = Experiments.DIVER_iEEG_FINAL_model(d_model=128, e_layers=3)
+            stock_model = diver_mod.build_model(stock_cfg).eval()
+            stock_model.load_state_dict(compat["model_state_dict"], strict=True)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

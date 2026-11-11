@@ -481,6 +481,20 @@ class TestTier1FeatureCoverage(BaseAcceptanceTest):
             f"Remote origin not configured for Transconnectome/chaewon_ahyeon_research_review: {res.stdout}"
         )
 
+    def test_f6_06_additional_advice_indexed_in_readme(self):
+        """[T1-F6-06] Verify docs/05_additional_advice.md is properly indexed and summarized in README.md."""
+        content = self.read_doc_safe("README.md", min_size=3000)
+        self.assertIn(
+            "docs/05_additional_advice.md",
+            content,
+            "README.md document index missing link to docs/05_additional_advice.md",
+        )
+        self.assertTrue(
+            bool(re.search(r"(결정적 추가 조언|Critical Additional Advice)", content)),
+            "README.md missing Critical Additional Advice section",
+        )
+        self.read_doc_safe("docs/05_additional_advice.md", min_size=4000)
+
     # --- F7: E2E Acceptance Criteria Verification ---
 
     def test_f7_01_acceptance_checklist_representation(self):
@@ -1164,6 +1178,7 @@ class TestTier4AcceptanceScenarios(BaseAcceptanceTest):
         self.read_doc_safe("docs/02_deep_research_literature.md", min_size=4000)
         self.read_doc_safe("docs/03_adversarial_review.md", min_size=4000)
         self.read_doc_safe("docs/04_action_items_roadmap.md", min_size=3500)
+        self.read_doc_safe("docs/05_additional_advice.md", min_size=4000)
         self.read_doc_safe("README.md", min_size=3000)
         self.check_git_initialized()
 
