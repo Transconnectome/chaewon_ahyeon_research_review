@@ -1,0 +1,837 @@
+{
+  "check_1_neuroprobe_15tasks": {
+    "counts_1of64": {
+      "유지": 5,
+      "판정 불가": 10,
+      "깨짐": 0
+    },
+    "counts_1of1024": {
+      "유지": 7,
+      "판정 불가": 8,
+      "깨짐": 0
+    },
+    "draft_typo_1of64": {
+      "유지": 6,
+      "판정 불가": 9,
+      "깨짐": 0
+    },
+    "draft_typo_1of1024": {
+      "유지": 8,
+      "판정 불가": 7,
+      "깨짐": 0
+    },
+    "sig_fdr_negative_1of64": [],
+    "sig_fdr_negative_1of1024": [],
+    "sig_fdr_positive_1of1024": [
+      "word_gap"
+    ],
+    "rows_1of64": [
+      {
+        "task": "delta_volume",
+        "n_units": 4,
+        "mean": 0.0005,
+        "lo95": -0.0045,
+        "hi95": 0.0055,
+        "t_stat": 0.2571,
+        "p_two_sided": 0.8073769363876859,
+        "lo_bonf15": -0.0097,
+        "hi_bonf15": 0.0107,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "face_num",
+        "n_units": 1,
+        "mean": -0.0032,
+        "lo95": -0.0135,
+        "hi95": 0.0072,
+        "t_stat": -0.7948,
+        "p_two_sided": 0.46278716237177475,
+        "lo_bonf15": -0.0243,
+        "hi_bonf15": 0.0179,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "frame_brightness",
+        "n_units": 1,
+        "mean": -0.006,
+        "lo95": -0.0241,
+        "hi95": 0.0122,
+        "t_stat": -0.8498,
+        "p_two_sided": 0.43424061883121357,
+        "lo_bonf15": -0.0431,
+        "hi_bonf15": 0.0311,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "global_flow",
+        "n_units": 2,
+        "mean": -0.0017,
+        "lo95": -0.009,
+        "hi95": 0.0056,
+        "t_stat": -0.5986,
+        "p_two_sided": 0.5755058168639668,
+        "lo_bonf15": -0.0166,
+        "hi_bonf15": 0.0132,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "gpt2_surprisal",
+        "n_units": 3,
+        "mean": 0.0015,
+        "lo95": -0.0035,
+        "hi95": 0.0065,
+        "t_stat": 0.7712,
+        "p_two_sided": 0.47544885080265153,
+        "lo_bonf15": -0.0087,
+        "hi_bonf15": 0.0117,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "local_flow",
+        "n_units": 3,
+        "mean": -0.0007,
+        "lo95": -0.0065,
+        "hi95": 0.0051,
+        "t_stat": -0.3102,
+        "p_two_sided": 0.7688914230327419,
+        "lo_bonf15": -0.0125,
+        "hi_bonf15": 0.0111,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "onset",
+        "n_units": 5,
+        "mean": 0.0003,
+        "lo95": -0.0022,
+        "hi95": 0.0029,
+        "t_stat": 0.3024,
+        "p_two_sided": 0.7745072382401315,
+        "lo_bonf15": -0.0049,
+        "hi_bonf15": 0.0055,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "유지",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "pitch",
+        "n_units": 4,
+        "mean": -0.0009,
+        "lo95": -0.0045,
+        "hi95": 0.0027,
+        "t_stat": -0.6426,
+        "p_two_sided": 0.5487589716136005,
+        "lo_bonf15": -0.0082,
+        "hi_bonf15": 0.0064,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "speech",
+        "n_units": 5,
+        "mean": 0.001,
+        "lo95": -0.0029,
+        "hi95": 0.005,
+        "t_stat": 0.6508,
+        "p_two_sided": 0.5439055993980957,
+        "lo_bonf15": -0.0071,
+        "hi_bonf15": 0.0091,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "volume",
+        "n_units": 4,
+        "mean": -0.0033,
+        "lo95": -0.0136,
+        "hi95": 0.0069,
+        "t_stat": -0.8276,
+        "p_two_sided": 0.4455849215726575,
+        "lo_bonf15": -0.0242,
+        "hi_bonf15": 0.0176,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "word_gap",
+        "n_units": 4,
+        "mean": -0.0008,
+        "lo95": -0.0063,
+        "hi95": 0.0047,
+        "t_stat": -0.3739,
+        "p_two_sided": 0.7238074994674817,
+        "lo_bonf15": -0.012,
+        "hi_bonf15": 0.0104,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "word_head_pos",
+        "n_units": 2,
+        "mean": 0.0006,
+        "lo95": -0.0075,
+        "hi95": 0.0086,
+        "t_stat": 0.1916,
+        "p_two_sided": 0.8555962614272861,
+        "lo_bonf15": -0.0158,
+        "hi_bonf15": 0.017,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "word_index",
+        "n_units": 4,
+        "mean": -0.0014,
+        "lo95": -0.0059,
+        "hi95": 0.0031,
+        "t_stat": -0.7997,
+        "p_two_sided": 0.46015343028484956,
+        "lo_bonf15": -0.0106,
+        "hi_bonf15": 0.0078,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "word_length",
+        "n_units": 4,
+        "mean": -0.0005,
+        "lo95": -0.0061,
+        "hi95": 0.0051,
+        "t_stat": -0.2295,
+        "p_two_sided": 0.8275611178788356,
+        "lo_bonf15": -0.0119,
+        "hi_bonf15": 0.0109,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      },
+      {
+        "task": "word_part_speech",
+        "n_units": 3,
+        "mean": -0.0026,
+        "lo95": -0.0067,
+        "hi95": 0.0015,
+        "t_stat": -1.6301,
+        "p_two_sided": 0.16400381023288935,
+        "lo_bonf15": -0.011,
+        "hi_bonf15": 0.0058,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.8555962614272861
+      }
+    ],
+    "rows_1of1024": [
+      {
+        "task": "delta_volume",
+        "n_units": 4,
+        "mean": 0.003,
+        "lo95": -0.0016,
+        "hi95": 0.0075,
+        "t_stat": 1.6949,
+        "p_two_sided": 0.1508675582895891,
+        "lo_bonf15": -0.0063,
+        "hi_bonf15": 0.0123,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.40726155034726114
+      },
+      {
+        "task": "face_num",
+        "n_units": 1,
+        "mean": -0.0009,
+        "lo95": -0.0128,
+        "hi95": 0.0111,
+        "t_stat": -0.1936,
+        "p_two_sided": 0.8541080572833293,
+        "lo_bonf15": -0.0253,
+        "hi_bonf15": 0.0235,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.9245477542949028
+      },
+      {
+        "task": "frame_brightness",
+        "n_units": 1,
+        "mean": -0.0093,
+        "lo95": -0.0241,
+        "hi95": 0.0055,
+        "t_stat": -1.6153,
+        "p_two_sided": 0.1671676507278539,
+        "lo_bonf15": -0.0395,
+        "hi_bonf15": 0.0209,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.40726155034726114
+      },
+      {
+        "task": "global_flow",
+        "n_units": 2,
+        "mean": -0.0014,
+        "lo95": -0.0106,
+        "hi95": 0.0077,
+        "t_stat": -0.3933,
+        "p_two_sided": 0.7102993072825554,
+        "lo_bonf15": -0.0201,
+        "hi_bonf15": 0.0173,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.9245477542949028
+      },
+      {
+        "task": "gpt2_surprisal",
+        "n_units": 3,
+        "mean": 0.0051,
+        "lo95": -0.0035,
+        "hi95": 0.0138,
+        "t_stat": 1.5156,
+        "p_two_sided": 0.1900553901620552,
+        "lo_bonf15": -0.0126,
+        "hi_bonf15": 0.0228,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.40726155034726114
+      },
+      {
+        "task": "local_flow",
+        "n_units": 3,
+        "mean": -0.0007,
+        "lo95": -0.0106,
+        "hi95": 0.0092,
+        "t_stat": -0.1818,
+        "p_two_sided": 0.8629112373419092,
+        "lo_bonf15": -0.0209,
+        "hi_bonf15": 0.0195,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.9245477542949028
+      },
+      {
+        "task": "onset",
+        "n_units": 5,
+        "mean": 0.0016,
+        "lo95": -0.0006,
+        "hi95": 0.0037,
+        "t_stat": 1.913,
+        "p_two_sided": 0.113948253068334,
+        "lo_bonf15": -0.0028,
+        "hi_bonf15": 0.006,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "유지",
+        "q_bh15": 0.40726155034726114
+      },
+      {
+        "task": "pitch",
+        "n_units": 4,
+        "mean": -0.0026,
+        "lo95": -0.0078,
+        "hi95": 0.0027,
+        "t_stat": -1.2731,
+        "p_two_sided": 0.2589776549175351,
+        "lo_bonf15": -0.0133,
+        "hi_bonf15": 0.0081,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.4855831029703783
+      },
+      {
+        "task": "speech",
+        "n_units": 5,
+        "mean": -0.0006,
+        "lo95": -0.0032,
+        "hi95": 0.0019,
+        "t_stat": -0.6048,
+        "p_two_sided": 0.5716806259111726,
+        "lo_bonf15": -0.0058,
+        "hi_bonf15": 0.0046,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.857520938866759
+      },
+      {
+        "task": "volume",
+        "n_units": 4,
+        "mean": -0.0059,
+        "lo95": -0.0122,
+        "hi95": 0.0004,
+        "t_stat": -2.4074,
+        "p_two_sided": 0.06106208726754625,
+        "lo_bonf15": -0.0188,
+        "hi_bonf15": 0.007,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.30531043633773125
+      },
+      {
+        "task": "word_gap",
+        "n_units": 4,
+        "mean": 0.0078,
+        "lo95": 0.0043,
+        "hi95": 0.0113,
+        "t_stat": 5.7287,
+        "p_two_sided": 0.0022685289810426834,
+        "lo_bonf15": 0.0007,
+        "hi_bonf15": 0.0149,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "유지",
+        "q_bh15": 0.03402793471564025
+      },
+      {
+        "task": "word_head_pos",
+        "n_units": 2,
+        "mean": 0.0006,
+        "lo95": -0.0056,
+        "hi95": 0.0068,
+        "t_stat": 0.2488,
+        "p_two_sided": 0.8134369042113891,
+        "lo_bonf15": -0.0121,
+        "hi_bonf15": 0.0133,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.9245477542949028
+      },
+      {
+        "task": "word_index",
+        "n_units": 4,
+        "mean": 0.0074,
+        "lo95": 0.0007,
+        "hi95": 0.014,
+        "t_stat": 2.8605,
+        "p_two_sided": 0.035385875845003856,
+        "lo_bonf15": -0.0062,
+        "hi_bonf15": 0.021,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.2653940688375289
+      },
+      {
+        "task": "word_length",
+        "n_units": 4,
+        "mean": 0.0024,
+        "lo95": -0.0041,
+        "hi95": 0.0089,
+        "t_stat": 0.9491,
+        "p_two_sided": 0.3861355044697592,
+        "lo_bonf15": -0.0109,
+        "hi_bonf15": 0.0157,
+        "verdict_uncorrected": "유지",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.6435591741162653
+      },
+      {
+        "task": "word_part_speech",
+        "n_units": 3,
+        "mean": 0.0002,
+        "lo95": -0.0063,
+        "hi95": 0.0067,
+        "t_stat": 0.0791,
+        "p_two_sided": 0.9400251716868047,
+        "lo_bonf15": -0.0131,
+        "hi_bonf15": 0.0135,
+        "verdict_uncorrected": "판정 불가",
+        "verdict_bonf15": "판정 불가",
+        "q_bh15": 0.9400251716868046
+      }
+    ]
+  },
+  "check_2_holdout_vs_newsubj": {
+    "heldout_all_mean": 0.097,
+    "newsubj_all_mean": 0.2791,
+    "raw_loss_ratio": 2.88,
+    "input_amplitude_inflation": 2.0,
+    "pure_mse_quadratic_factor": 4.0,
+    "found_missing_div2_in_newsubj_cell_py": true,
+    "same_subject_1024_rel_pct": [
+      8.5,
+      7.75,
+      9.25
+    ],
+    "unseen_subject_1024_rel_pct": [
+      -0.06,
+      -1.34,
+      1.21
+    ]
+  },
+  "check_3_n2_subject_scaling": {
+    "matched_records_64": 9757,
+    "matched_records_1024": 610,
+    "hospital_stratification": "1 SNUH + 1 AJILE across all 6 seeds (12 disjoint subjects)",
+    "depth_corr_64": {
+      "r": 0.428,
+      "p_two_sided": 0.397
+    },
+    "depth_corr_1024": {
+      "r": 0.473,
+      "p_two_sided": 0.344
+    },
+    "depth_corr_byd_64": {
+      "r": -0.415,
+      "p_two_sided": 0.413
+    },
+    "max_single_patient_share_s2": 0.7975,
+    "min_effective_n_s2": 1.477,
+    "seeds": [
+      {
+        "seed": 1,
+        "pair": [
+          "iEEG_Sub23",
+          "sub-09_AJILE"
+        ],
+        "orig_counts": [
+          18038,
+          14008
+        ],
+        "kept_64": [
+          5492,
+          4265
+        ],
+        "depth_frac": 0.227,
+        "d_64": 0.0027,
+        "d_1024": 0.003,
+        "byd_64": 0.001,
+        "max_patient_share": 0.5629,
+        "effective_n_subjects": 1.969,
+        "equal_cap_64": [
+          4879,
+          4878
+        ]
+      },
+      {
+        "seed": 2,
+        "pair": [
+          "iEEG_Sub26",
+          "sub-10_AJILE"
+        ],
+        "orig_counts": [
+          54639,
+          13877
+        ],
+        "kept_64": [
+          7781,
+          1976
+        ],
+        "depth_frac": 0.147,
+        "d_64": -0.0093,
+        "d_1024": -0.006,
+        "byd_64": -0.0047,
+        "max_patient_share": 0.7975,
+        "effective_n_subjects": 1.477,
+        "equal_cap_64": [
+          4879,
+          4878
+        ]
+      },
+      {
+        "seed": 3,
+        "pair": [
+          "iEEG_Sub1",
+          "sub-11_AJILE"
+        ],
+        "orig_counts": [
+          18771,
+          14008
+        ],
+        "kept_64": [
+          5587,
+          4170
+        ],
+        "depth_frac": 0.263,
+        "d_64": -0.0055,
+        "d_1024": -0.0039,
+        "byd_64": -0.0122,
+        "max_patient_share": 0.5726,
+        "effective_n_subjects": 1.959,
+        "equal_cap_64": [
+          4879,
+          4878
+        ]
+      },
+      {
+        "seed": 4,
+        "pair": [
+          "iEEG_Sub18",
+          "sub-03_AJILE"
+        ],
+        "orig_counts": [
+          16962,
+          11213
+        ],
+        "kept_64": [
+          5874,
+          3883
+        ],
+        "depth_frac": 0.241,
+        "d_64": -0.0065,
+        "d_1024": -0.008,
+        "byd_64": -0.0101,
+        "max_patient_share": 0.602,
+        "effective_n_subjects": 1.92,
+        "equal_cap_64": [
+          4879,
+          4878
+        ]
+      },
+      {
+        "seed": 5,
+        "pair": [
+          "iEEG_Sub24",
+          "sub-06_AJILE"
+        ],
+        "orig_counts": [
+          23769,
+          13025
+        ],
+        "kept_64": [
+          6303,
+          3454
+        ],
+        "depth_frac": 0.069,
+        "d_64": -0.0057,
+        "d_1024": -0.0063,
+        "byd_64": -0.0035,
+        "max_patient_share": 0.646,
+        "effective_n_subjects": 1.843,
+        "equal_cap_64": [
+          4879,
+          4878
+        ]
+      },
+      {
+        "seed": 6,
+        "pair": [
+          "iEEG_Sub17",
+          "sub-08_AJILE"
+        ],
+        "orig_counts": [
+          17413,
+          13989
+        ],
+        "kept_64": [
+          5410,
+          4347
+        ],
+        "depth_frac": 0.096,
+        "d_64": -0.0089,
+        "d_1024": -0.0098,
+        "byd_64": -0.0054,
+        "max_patient_share": 0.5545,
+        "effective_n_subjects": 1.977,
+        "equal_cap_64": [
+          4879,
+          4878
+        ]
+      }
+    ]
+  },
+  "check_4_effdim_and_layers": {
+    "effdim2_groups": {
+      "input_spec_251d": {
+        "pr_z": [
+          15.28,
+          0.0
+        ],
+        "pc90_z": [
+          121.6,
+          0.0
+        ]
+      },
+      "scratch": {
+        "pr_z": [
+          5.01,
+          1.47
+        ],
+        "pc90_z": [
+          54.73,
+          10.33
+        ],
+        "sketch_pr_z": [
+          136.84,
+          21.75
+        ]
+      },
+      "R1024": {
+        "pr_z": [
+          7.35,
+          1.67
+        ],
+        "pc90_z": [
+          49.23,
+          4.71
+        ],
+        "sketch_pr_z": [
+          102.56,
+          8.35
+        ]
+      },
+      "R256": {
+        "pr_z": [
+          5.82,
+          0.62
+        ],
+        "pc90_z": [
+          33.08,
+          3.01
+        ],
+        "sketch_pr_z": [
+          91.67,
+          5.59
+        ]
+      },
+      "R1.5625": {
+        "pr_z": [
+          5.81,
+          0.47
+        ],
+        "pc90_z": [
+          30.15,
+          2.88
+        ],
+        "sketch_pr_z": [
+          86.34,
+          2.45
+        ]
+      },
+      "Base": {
+        "pr_z": [
+          5.42,
+          0.42
+        ],
+        "pc90_z": [
+          28.05,
+          1.59
+        ],
+        "sketch_pr_z": [
+          86.32,
+          1.43
+        ]
+      },
+      "F1.5625": {
+        "pr_z": [
+          10.68,
+          0.85
+        ],
+        "pc90_z": [
+          37.93,
+          1.43
+        ],
+        "sketch_pr_z": [
+          97.62,
+          16.39
+        ]
+      }
+    },
+    "readout_layers": {
+      "Base_d2_9.4M": {
+        "1/64_rd1": [
+          -0.0004,
+          -0.0019,
+          0.0012,
+          "유지"
+        ],
+        "1/64_rdall": [
+          -0.0,
+          -0.002,
+          0.0019,
+          "유지"
+        ],
+        "1/1024_rd1": [
+          0.0006,
+          -0.0012,
+          0.0024,
+          "유지"
+        ],
+        "1/1024_rdall": [
+          -0.0029,
+          -0.0063,
+          0.0005,
+          "판정 불가"
+        ]
+      },
+      "Small_d12_51.4M": {
+        "1/64_rd1": [
+          -0.0004,
+          -0.0026,
+          0.0017,
+          "유지"
+        ],
+        "1/64_rdall": [
+          -0.0006,
+          -0.0021,
+          0.0008,
+          "유지"
+        ],
+        "1/1024_rd1": [
+          0.0003,
+          -0.0014,
+          0.0021,
+          "유지"
+        ],
+        "1/1024_rdall": [
+          -0.005,
+          -0.0072,
+          -0.0028,
+          "깨짐"
+        ]
+      }
+    },
+    "toy_demo_noise_cleanup": {
+      "before_cleanup_pr_pc90": [
+        9.49,
+        49
+      ],
+      "after_cleanup_pr_pc90": [
+        5.08,
+        5
+      ]
+    }
+  },
+  "check_5_diver2_bug_demos": {
+    "rope_bf16": {
+      "max_len": 6001,
+      "unique_in_bfloat16": 829,
+      "unique_in_float32": 6001,
+      "collided_positions": 5172,
+      "collision_pct": 86.19,
+      "example_4096_step8_in_bf16": [
+        4096.0,
+        4096.0,
+        4096.0,
+        4128.0,
+        4128.0
+      ]
+    },
+    "neuroprobe_voxel": {
+      "normal_mni_coord_mm": [
+        -52.0,
+        -24.0,
+        -8.0
+      ],
+      "normal_r_hat": 0.452,
+      "normal_legendre_p3": -0.447,
+      "neuroprobe_voxel_coord": [
+        135.0,
+        148.0,
+        138.0
+      ],
+      "voxel_norm_as_mm": 243.3,
+      "voxel_r_hat": 1.9,
+      "voxel_legendre_p3": 14.308
+    }
+  }
+}

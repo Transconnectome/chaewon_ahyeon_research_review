@@ -51,9 +51,11 @@
 | **R2-2** | [docs/03_adversarial_review.md](docs/03_adversarial_review.md) | 과학적 방법론에 기반한 5대 적대적 검증 축(가설 타당성, 인과 추론, 대조군 설계, 재구성 손실 역설, 통계적 엄밀성), 취약점 규명 및 칼 포퍼 반증 조건 | 차지욱 교수님, 이아현 선생님, 안채원 선생님 |
 | **R3** | [docs/04_action_items_roadmap.md](docs/04_action_items_roadmap.md) | 3단계 우선순위 실행 로드맵 (Tier 1: AAAI 2027 NeuroAI 워크숍 마감 11/20, Tier 2: DIVER-2 저널 논문, Tier 3: 실시간 임상 BCI), 구체적 액션 아이템 18건 | 안채원 선생님, 이아현 선생님, 차지욱 교수님 |
 | **R3-New** | [docs/05_additional_advice.md](docs/05_additional_advice.md) | DIVER-2 파운데이션 모델 및 iMindBench 전수 재검토 기반 15대 사각지대 규명, 비대칭 MAE 4대 코드 결함 수정, 11/20 워크숍 즉각 조치 5건 및 본 논문 확장 로드맵 5건 | 안채원 선생님, 이아현 선생님, 차지욱 교수님 |
+| **R4-Guide** | [docs/06_student_friendly_guide_and_solutions.md](docs/06_student_friendly_guide_and_solutions.md) | **11/20 워크숍 마감용 쉬운 해설서 & 복붙 해결 패키지**: 부록 C 15개 과제 완성 표(`5/10/0`, `7/8/0`, BH-FDR $q$-값), `PR` vs `90% 주성분 수(PC90)` 정정 문장, `newsubj_cell.py` `/ 2.0` 스케일 해명, `n=6` 확정 문안 | 안채원 선생님, 이아현 선생님, 차지욱 교수님 |
 | **Spec** | [PROJECT.md](PROJECT.md) | 프로젝트 아키텍처, 기능 인벤토리(F1~F7), 마일스톤(M1~M5) 및 인터페이스 계약 명세서 | 연구진 공통 |
 | **Infra** | [TEST_INFRA.md](TEST_INFRA.md) | E2E 테스트 인프라 아키텍처, 4-Tier 검증 계층 명세, 거버넌스 및 엄격한 호칭 정책 가이드 | 연구진 공통 |
 | **Ready** | [TEST_READY.md](TEST_READY.md) | 테스트 스위트 준비 상태 점검표 및 독립 검증 절차서 | 연구진 공통 |
+| **Checks** | [code/workshop_checks/README.md](code/workshop_checks/README.md) | 11/20 워크숍 초안 5대 수치·통계 자동 검산 스크립트(`run_all_checks.py`), 부록 C 마크다운 생성기 및 5종 복붙 스니펫 | 안채원 선생님, 이아현 선생님, 차지욱 교수님 |
 | **Code** | [code/asymmetric_mae/README.md](code/asymmetric_mae/README.md) | 진정한 비대칭 인코더-디코더 MAE (`AsymmetricMultiHeadMAEModel`) `DIVER-2` 무수정 드롭인 구현, 실행 래퍼 및 7대 스모크 테스트 | 안채원 선생님, 이아현 선생님, 차지욱 교수님 |
 
 ---
